@@ -39,5 +39,4 @@ export interface AuroraDataApiConnectionCredentialsOptions {
      * Object with ssl parameters or a string containing name of ssl profile.
      */
     readonly ssl?: any;
-
 }
