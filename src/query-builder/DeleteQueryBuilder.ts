@@ -6,7 +6,7 @@ import {ObjectType} from "../common/ObjectType";
 import {Connection} from "../connection/Connection";
 import {QueryRunner} from "../query-runner/QueryRunner";
 import {SqlServerDriver} from "../driver/sqlserver/SqlServerDriver";
-import {PostgresDriver} from "../driver/postgres/PostgresDriver";
+import {AuroraDataApiPostgresDriver, PostgresDriver} from "../driver/postgres/PostgresDriver";
 import {WhereExpression} from "./WhereExpression";
 import {Brackets} from "./Brackets";
 import {DeleteResult} from "./result/DeleteResult";
@@ -74,8 +74,10 @@ export class DeleteQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
             if (driver instanceof MysqlDriver || driver instanceof AuroraDataApiDriver) {
                 deleteResult.raw = result;
                 deleteResult.affected = result.affectedRows;
-
-            } else if (driver instanceof SqlServerDriver || driver instanceof PostgresDriver || driver instanceof CockroachDriver) {
+            } else if (driver instanceof AuroraDataApiPostgresDriver) {
+                deleteResult.raw = result;
+                deleteResult.affected = result.numberOfRecordsUpdated;
+            } else if (driver instanceof SqlServerDriver || (driver instanceof PostgresDriver && !(driver instanceof AuroraDataApiPostgresDriver)) || driver instanceof CockroachDriver) {
                 deleteResult.raw = result[0] ? result[0] : null;
                 // don't return 0 because it could confuse. null means that we did not receive this value
                 deleteResult.affected = typeof result[1] === "number" ? result[1] : null;
